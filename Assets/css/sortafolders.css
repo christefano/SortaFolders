@@ -1,0 +1,290 @@
+.sortafolders-badge {
+    display: inline-block;
+    margin-left: 0.5em;
+    padding: 0 0.5em;
+    border: 1px solid var(--table-list-header-border-color);
+    border-radius: 3px;
+    background: var(--table-list-header-background-color);
+    color: var(--link-color-primary);
+    font-size: 0.8em;
+    white-space: nowrap;
+    vertical-align: middle;
+}
+
+
+/* On a project's board the badge sits at the far right, level with the view tabs. */
+.project-header > .sortafolders-badge {
+    float: right;
+    margin: 4px 0 0 0.5em;
+}
+
+.project-header > .sortafolders-badge ~ .filter-box-component {
+    display: flow-root;
+}
+
+.sortafolders-count {
+    margin-left: 0.5em;
+    color: var(--color-primary);
+    font-weight: normal;
+}
+
+.sortafolders-children {
+    margin-left: 1.5em;
+}
+
+summary.sortafolders-folder {
+    display: block;
+    position: relative;
+    margin-top: 1em;
+    padding-right: 2.5em;
+    cursor: pointer;
+}
+
+/* The tiny disclosure triangle at the far right of the folder bar: points right when closed, down when open. Decorative, since the browser already announces a summary as expandable. */
+summary.sortafolders-folder::-webkit-details-marker {
+    display: none;
+}
+
+summary.sortafolders-folder::after {
+    content: "\25B6";
+    position: absolute;
+    right: 1em;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 0.6em;
+    opacity: 0.6;
+}
+
+details[open] > summary.sortafolders-folder::after {
+    transform: translateY(-50%) rotate(90deg);
+}
+
+/* The line just inside an open folder: Edit link, description tooltip, progress bar, hours and the BigBoard links. Nothing interactive sits in the summary, so a screen reader announces only the name and the count. */
+.sortafolders-line {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0 1em;
+    margin: 0.2em 0 0 1.5em;
+    font-size: 0.9em;
+}
+
+.sortafolders-extra {
+    display: inline-flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0 1em;
+}
+
+details:not([open]) > .sortafolders-line .sortafolders-extra {
+    display: none;
+}
+
+.sortafolders-description {
+    margin: 0 0 1em;
+    white-space: pre-line;
+}
+
+.sortafolders-settings {
+    margin-bottom: 2em;
+}
+
+.sortafolders-settings fieldset {
+    margin: 0 0 1em;
+}
+
+.sortafolders-icons {
+    display: grid;
+    grid-template-columns: repeat(5, max-content);
+    gap: 0.5em 1.5em;
+}
+
+.sortafolders-icons label {
+    margin: 0;
+    font-weight: normal;
+    white-space: nowrap;
+}
+
+.sortafolders-sr {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    margin: -1px;
+    padding: 0;
+    border: 0;
+    clip: rect(0 0 0 0);
+    clip-path: inset(50%);
+    white-space: nowrap;
+}
+
+/* Hidden until the script has moved the project sidebar item, so it does not jump. The script adds the class itself, so a page without it shows the item where the hook put it. */
+.sortafolders-js .sidebar li[data-sortafolders="project-item"]:not(.sortafolders-placed) {
+    visibility: hidden;
+}
+
+/* A long folder path would otherwise widen the New project popup to the length of its longest option. */
+select[name="sortafolders_folder_id"] {
+    width: 26em;
+    max-width: 100%;
+}
+
+
+.sortafolders-meta {
+    color: var(--color-primary);
+    font-size: 0.9em;
+    font-weight: normal;
+}
+
+.sortafolders-meta span + span::before {
+    content: "\00b7";
+    margin: 0 0.5em;
+}
+
+.sortafolders-progress progress {
+    width: 8em;
+    height: 0.75em;
+    vertical-align: middle;
+}
+
+li.sortafolders-meta {
+    margin-top: 0;
+}
+
+.table-list-header-menu > a,
+.table-list-header-menu > .dropdown {
+    margin-left: 1em;
+}
+
+.sortafolders-motd {
+    clear: both;
+    margin: 0 0 1em;
+    padding: 0.5em 1em;
+    border: 1px solid var(--table-list-header-border-color);
+    border-radius: 3px;
+    background: var(--table-list-header-background-color);
+}
+
+.sortafolders-motd summary {
+    cursor: pointer;
+}
+
+.sortafolders-motd .markdown {
+    margin-top: 0.5em;
+}
+
+/* Archive confirmation: a blank line before and after the list of projects it closes. */
+.sortafolders-archive-list {
+    margin: 1em 0;
+}
+
+.sortafolders-light {
+    display: inline-block;
+    margin-left: 0.4em;
+    font-size: 0.9em;
+}
+
+.sortafolders-light-red { color: #b71c1c; }
+.sortafolders-light-yellow { color: #8a5300; }
+.sortafolders-light-green { color: #2e7d32; }
+
+.sortafolders-quiet { margin-left: 0.5em; color: #8a5300; }
+
+.sortafolders-spark { vertical-align: middle; }
+
+.sortafolders-strip {
+    margin: 0 0 1em;
+    padding: 0.5em 0.75em;
+    border: 1px solid var(--table-list-header-border-color);
+    border-radius: 3px;
+    background: var(--table-list-header-background-color);
+}
+
+.sortafolders-strip summary { cursor: pointer; }
+.sortafolders-strip ul { margin: 0.25em 0 0; padding: 0; list-style: none; }
+
+.sortafolders-tabs { margin: 0 0 1em; }
+/* The tab bar and its Clear link share one row, level with each other. The open tab is bold. */
+.sortafolders-tabs .views-switcher-component { display: flex; align-items: center; flex-wrap: wrap; gap: 0.5em; margin: 0; }
+.sortafolders-tabs .views { margin: 0; }
+.sortafolders-tabs .views li.active a, .sortafolders-tabs .views a[aria-current] { font-weight: 700; }
+.sortafolders-clear { font-size: 0.9em; }
+
+.sortafolders-note { margin: 0.25em 0 1em 1.5em; padding: 0.5em 0.75em; }
+.sortafolders-note { display: flex; align-items: baseline; gap: 1em; color: var(--color-primary); border-left: 4px solid transparent; background: color-mix(in srgb, currentColor 5%, transparent); }
+/* The flag shows in the border and the icon (and in words for a screen reader), the text keeps the theme's text color. */
+.sortafolders-note-red { --sf-flag: #b71c1c; }
+.sortafolders-note-yellow { --sf-flag: #8a5300; }
+.sortafolders-note-green { --sf-flag: #2e7d32; }
+.sortafolders-note-red, .sortafolders-note-yellow, .sortafolders-note-green { border-left-color: var(--sf-flag); background: color-mix(in srgb, var(--sf-flag) 8%, transparent); }
+.sortafolders-note-red .fa, .sortafolders-note-yellow .fa, .sortafolders-note-green .fa { color: var(--sf-flag); }
+.sortafolders-note-main { flex: 1; min-width: 0; }
+.sortafolders-note-aside { flex: none; white-space: nowrap; font-size: 0.85em; }
+.sortafolders-note-aside > * { margin-left: 1em; }
+.sortafolders-note-aside a { text-decoration: underline; }
+/* The Access report on the settings page. */
+.sortafolders-who { display: inline-block; margin: 0 1em 0.15em 0; white-space: nowrap; }
+.sortafolders-src { margin-left: 0.2em; }
+.sortafolders-legend { margin: 0.5em 0 1em; font-size: 0.9em; }
+.sortafolders-legend .fa { margin-left: 1em; }
+.sortafolders-none { opacity: 0.7; }
+/* Space between the breadcrumb and what follows it. */
+.sortafolders-path { margin: 0 0 1em; }
+/* The author and date sit inline at the end of the note text. */
+.sortafolders-note-by { margin-left: 0.5em; font-size: 0.85em; white-space: nowrap; }
+/* A folder with no note has only the links, so they sit at the left edge. */
+.sortafolders-note-bare .sortafolders-note-aside > :first-child { margin-left: 0; }
+
+.sortafolders-notes { list-style: none; margin: 1em 0; padding: 0; }
+.sortafolders-notes li { margin: 0 0 0.75em; }
+.sortafolders-inline { display: inline; }
+
+/* Project row: the title line, then one quiet line of details, then the activity sparkline captioned on the right. */
+.sortafolders-details {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0 1.25em;
+    margin-top: 0.2em;
+    font-size: 0.85em;
+    opacity: 0.85;
+}
+
+.sortafolders-spark-box { white-space: nowrap; margin-right: 0.5em; }
+.sortafolders-spark-box small { opacity: 0.7; }
+.sortafolders-project { display: flex; align-items: flex-start; }
+.sortafolders-project > div:first-child { flex: 1; min-width: 0; }
+.sortafolders-project > .table-list-icons { flex: none; }
+.sortafolders-label { opacity: 0.8; margin-right: 0.15em; }
+
+/* Kanboard's stripe color (--table-nth-background-color) is almost white, so the folders table on the settings page tints its own stripes from the text color and follows the light and dark themes. */
+.sortafolders-settings .table-striped { --table-nth-background-color: color-mix(in srgb, currentColor 6%, transparent); }
+
+/* A BigBoard link with no matching task stays in place, greyed out and not clickable. */
+.sortafolders-link-off { opacity: 0.5; }
+
+.sortafolders-grant-notes p { margin: 0; }
+.sortafolders-grant-notes .sortafolders-grant-lead { margin-bottom: 0.75em; }
+.sortafolders-grant-notes .sortafolders-grant-row + .sortafolders-grant-row { margin-top: 0.35em; }
+
+/* Dropdown menus: the note's link menu and the tab bar's All folders / My folders switch. */
+.sortafolders-note-aside .dropdown { display: inline-block; }
+.sortafolders-note-aside .dropdown > a { text-decoration: none; }
+.sortafolders-tabs .views li.dropdown { display: inline-block; }
+.sortafolders-tabs .views li.dropdown ul li { display: block; }
+
+
+/* The description icon and the progress bar sit on the folder bar, after the counts. */
+summary.sortafolders-folder .sortafolders-info { display: inline-block; vertical-align: middle; margin-left: 0.4em; }
+summary.sortafolders-folder .sortafolders-meta { display: inline-block; vertical-align: middle; margin-left: 1em; }
+
+
+/* The tab bar's split tabs: the label filters, the small caret opens a menu with "Filter this list" and "Open in BigBoard". A tab with no match is dimmed but stays a link. */
+.sortafolders-tabs .views { display: flex; flex-wrap: wrap; }
+.sortafolders-tabs .views li { display: inline-flex; align-items: center; white-space: nowrap; }
+.sortafolders-tabs .views li.sortafolders-tab-off > a.sortafolders-tab-label { opacity: 0.5; }
+.sortafolders-tab-caret { display: inline-flex; align-items: center; margin-left: 0.3em; }
+.sortafolders-tab-caret > a.dropdown-menu { padding: 0 0.2em; text-decoration: none; }
+
+/* Zebra stripes on the folder and project rows: every second row among its siblings. */
+.sortafolders-tree .sortafolders-project:nth-child(even),
+.sortafolders-tree .sortafolders-node:nth-child(even) > .sortafolders-folder { background: color-mix(in srgb, currentColor 6%, transparent); }
