@@ -147,16 +147,24 @@ class FolderModel extends Base
      */
     public function getPathLabel($folderId)
     {
-        $names = array();
+        return implode(self::SEPARATOR, array_column($this->getPathParts($folderId), 'name'));
+    }
+
+    /**
+     * The same folders as getPathLabel(), as a list of array('id' => ..., 'name' => ...), so each part can link to its folder.
+     */
+    public function getPathParts($folderId)
+    {
+        $parts = array();
         $visible = $this->getViewerFolders();
 
         foreach ($this->getPath($folderId) as $folder) {
             if ($visible === null || isset($visible[(int) $folder['id']])) {
-                $names[] = $folder['name'];
+                $parts[] = array('id' => (int) $folder['id'], 'name' => $this->getDisplayName($folder));
             }
         }
 
-        return implode(self::SEPARATOR, $names);
+        return $parts;
     }
 
     /**
@@ -194,8 +202,62 @@ class FolderModel extends Base
     }
 
     /**
-     * Ids of the folders an admin chose to hide, with every folder below them. Hidden folders stay in the settings
-     * table, Access and the edit dialogs, and leave the folder page, the pickers and BigBoard's group switcher.
+     * Whether an admin is looking at a folder that is hidden from everyone else: hidden itself or below a hidden folder. The
+     * same set as getHiddenIds(), so there is no second hide rule. False for anyone but a signed-in app admin.
+     */
+    public function isHiddenForAdmin($folderId)
+    {
+        return $this->userSession->isLogged() && $this->userSession->isAdmin() && isset($this->getHiddenIds()[(int) $folderId]);
+    }
+
+    /**
+     * The name to show for a folder row (needs 'id' and 'name'): the plain name, plus " (hidden)" when an admin looks at a
+     * hidden folder. Not escaped, and never stored or sorted on. Everyone else gets the name as it is.
+     */
+    public function getDisplayName(array $folder)
+    {
+        return $folder['name'].($this->isHiddenForAdmin($folder['id']) ? ' '.t('(hidden)') : '');
+    }
+
+    /**
+     * The hidden folders the signed-in user may not see: every one of them for anyone but an app admin, and none for an
+     * admin or no session, who see everything. Everything but the settings page asks this, not getHiddenIds().
+     */
+    public function getViewerHiddenIds()
+    {
+        if (! $this->userSession->isLogged() || $this->userSession->isAdmin()) {
+            return array();
+        }
+
+        return $this->getHiddenIds();
+    }
+
+    /**
+     * Ids of the projects sorted into a folder the signed-in user may not see (see getViewerHiddenIds()).
+     */
+    public function getHiddenProjectIds()
+    {
+        $hidden = $this->getViewerHiddenIds();
+        $ids = array();
+
+        if (empty($hidden)) {
+            return $ids;
+        }
+
+        foreach ($this->getAssignments() as $projectId => $folderId) {
+            if (isset($hidden[(int) $folderId])) {
+                $ids[] = (int) $projectId;
+            }
+        }
+
+        return $ids;
+    }
+
+    /**
+     * Ids of the folders an admin chose to hide, with every folder below them. Only app admins still see a hidden folder,
+     * its subfolders and their projects. Everyone else loses them from My folders, the folder pages, the pickers, the
+     * BigBoard folder menu and Selected projects, the attention strip, and the dashboard lists. The settings page reads
+     * this set as stored.
      */
     public function getHiddenIds()
     {
@@ -279,11 +341,12 @@ class FolderModel extends Base
         }
 
         $options = array(0 => $this->helper->sortaFolders->t('No parent folder'));
+        $hidden = $this->getViewerHiddenIds();
 
         foreach ($this->getFlatTree() as $item) {
             $id = $item['folder']['id'];
 
-            if (in_array($id, $exclude, true) || $item['depth'] + $height > self::MAX_DEPTH) {
+            if (in_array($id, $exclude, true) || isset($hidden[$id]) || $item['depth'] + $height > self::MAX_DEPTH) {
                 continue;
             }
 
@@ -296,10 +359,10 @@ class FolderModel extends Base
     /**
      * Folder choices for a project.
      */
-    public function getFolderOptions($keepId = 0)
+    public function getFolderOptions()
     {
         $options = array(0 => $this->helper->sortaFolders->t('No folder'));
-        $hidden = $this->hiddenExcept($keepId);
+        $hidden = $this->getViewerHiddenIds();
 
         foreach ($this->getFlatTree() as $item) {
             if (! isset($hidden[$item['folder']['id']])) {
@@ -313,7 +376,7 @@ class FolderModel extends Base
     /**
      * Folder choices for one user. App admins get the whole tree. Anyone else gets "No folder" and the
      * folders that hold one of their active projects or sit above such a folder (the same rule the
-     * folder page uses, through buildTree()). $keepId, the project's current folder, is always kept.
+     * folder page uses, through buildTree()). $keepId, the project's current folder, is kept unless it is hidden from the user.
      * User id 0 (no session) gets "No folder" only.
      */
     public function getFolderOptionsForUser($userId, $keepId = 0)
@@ -321,7 +384,7 @@ class FolderModel extends Base
         $userId = (int) $userId;
 
         if ($userId > 0 && $this->userSession->isLogged() && $this->userSession->getId() === $userId && $this->userSession->isAdmin()) {
-            return $this->getFolderOptions($keepId);
+            return $this->getFolderOptions();
         }
 
         $options = array(0 => $this->helper->sortaFolders->t('No folder'));
@@ -351,7 +414,7 @@ class FolderModel extends Base
             }
         }
 
-        $hidden = $this->hiddenExcept($keepId);
+        $hidden = $this->getViewerHiddenIds();
 
         foreach ($this->getFlatTree() as $item) {
             $id = $item['folder']['id'];
@@ -362,22 +425,6 @@ class FolderModel extends Base
         }
 
         return $options;
-    }
-
-    /**
-     * The hidden folders, minus a project's current folder and the folders above it, so editing a project never drops its folder.
-     */
-    private function hiddenExcept($keepId)
-    {
-        $hidden = $this->getHiddenIds();
-
-        if ((int) $keepId > 0 && $this->getById($keepId) !== null) {
-            foreach ($this->getPath($keepId) as $folder) {
-                unset($hidden[$folder['id']]);
-            }
-        }
-
-        return $hidden;
     }
 
     private function collectIds(array $nodes, array &$ids)
@@ -793,7 +840,7 @@ class FolderModel extends Base
     /**
      * Core has no project-created event, so the New project form posts `sortafolders_folder_id`
      * and Plugin.php calls this after the response: it finds the project that was just made
-     * (same name, same owner, newest, modified since the request began) and files it.
+     * (same name, same owner, newest, modified since the request began) and sorts it.
      */
     public function assignNewProject($name, $ownerId, $folderId, $since)
     {
@@ -819,7 +866,7 @@ class FolderModel extends Base
         $projectId = (int) $projectId;
         $folderId = (int) $folderId;
 
-        // Adopt what a duplicate copied before the filing changes. Only a project with a copied list has anything to adopt.
+        // Adopt what a duplicate copied before the sort changes. Only a project with a copied list has anything to adopt.
         if ($this->projectMetadataModel->exists($projectId, AccessModel::METADATA_KEY)) {
             $this->syncAccess();
         }
@@ -846,21 +893,25 @@ class FolderModel extends Base
      *
      * @return array array(nodes, projects that are in no folder)
      */
-    public function buildTree(array $projects, array $showEmpty = array(), $withHidden = false)
+    public function buildTree(array $projects, array $showEmpty = array())
     {
         $assignments = $this->getAssignments();
+        $hidden = $this->getViewerHiddenIds();
         $byFolder = array();
         $loose = array();
 
         foreach ($projects as $projectId => $project) {
             if (isset($assignments[$projectId])) {
-                $byFolder[$assignments[$projectId]][] = $project;
+                // A project in a folder hidden from the viewer is left out. It does not fall into the projects with no folder.
+                if (! isset($hidden[$assignments[$projectId]])) {
+                    $byFolder[$assignments[$projectId]][] = $project;
+                }
             } else {
                 $loose[] = $project;
             }
         }
 
-        return array($this->buildNodes(0, $byFolder, array(), $showEmpty, $withHidden ? array() : $this->getHiddenIds()), $loose);
+        return array($this->buildNodes(0, $byFolder, array(), $showEmpty, $hidden), $loose);
     }
 
     private function buildNodes($parentId, array $byFolder, array $seen, array $showEmpty = array(), array $hidden = array())
@@ -918,7 +969,7 @@ class FolderModel extends Base
     {
         $groups = array();
         $position = 0;
-        $hidden = $this->getHiddenIds();
+        $hidden = $this->getViewerHiddenIds();
         $viewer = $this->getViewerFolders();
 
         foreach ($this->getFlatTree() as $item) {

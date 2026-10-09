@@ -463,6 +463,23 @@ class FolderHelper extends Base
     }
 
     /**
+     * The folder path of each project, project id => label ("No folder" for a project that is not in one). BusyBee reads it for the
+     * blockers outside its page, so a closed project's blocker shows where it lives.
+     */
+    public function projectPaths(array $ids)
+    {
+        $assignments = $this->sortaFolderModel->getAssignments();
+        $paths = array();
+
+        foreach ($ids as $id) {
+            $id = (int) $id;
+            $paths[$id] = isset($assignments[$id]) ? $this->sortaFolderModel->getPathLabel($assignments[$id]) : $this->t('No folder');
+        }
+
+        return $paths;
+    }
+
+    /**
      * Whether BigBoard is loaded.
      */
     public function hasBigboard()
@@ -484,12 +501,12 @@ class FolderHelper extends Base
             return $this->helper->text->e($text);
         };
         $scope = array('plugin' => 'Bigboard', 'scope' => 'group:'.(int) $folderId);
-        $items = array('<li><a href="'.$e($this->helper->url->href('Bigboard', 'index', $scope)).'" title="'.$e(t('Open this folder in BigBoard.')).'">'.$e(t('Open this folder in BigBoard')).'</a></li>');
+        $items = array('<li><a href="'.$e($this->helper->url->href('Bigboard', 'index', $scope)).'" title="'.$e($this->t('Open this folder in BigBoard.')).'">'.$e('BigBoard: '.$this->t('Open this folder')).'</a></li>');
 
         foreach (array('overdue', 'today', 'soon', 'mine', 'unowned', 'blocked', 'stuck') as $key) {
             $empty = (int) $totals[$key] === 0;
             $href = $e($this->helper->url->href('Bigboard', 'index', $scope + array('search' => $this->tabSearch($key))));
-            $items[] = '<li'.($empty ? ' class="sortafolders-link-off"' : '').'><a href="'.$href.'" title="'.$e($this->bigboardTitle('projects', $key, $empty)).'">'.$e(rtrim($this->bigboardTitle('projects', $key), '.')).'</a></li>';
+            $items[] = '<li'.($empty ? ' class="sortafolders-link-off"' : '').'><a href="'.$href.'" title="'.$e($this->bigboardTitle('projects', $key, $empty)).'">'.$e('BigBoard: '.preg_replace('/ in BigBoard$/', '', rtrim($this->bigboardTitle('projects', $key), '.'))).'</a></li>';
         }
 
         return implode('', $items);
@@ -565,7 +582,7 @@ class FolderHelper extends Base
     }
 
     /**
-     * Who filing a project into each of these folders would give access to (folder id => array('path' => label,
+     * Who sorting a project into each of these folders would give access to (folder id => array('path' => label,
      * 'list' => list of array(user_id, name, role))), so an admin sees it before saving; empty for everyone else. Keyed by id because two
      * folders can share a path label. Shown on the New project and Edit folder forms.
      */
@@ -587,22 +604,63 @@ class FolderHelper extends Base
     }
 
     /**
-     * The project's folder as array('id', 'name', 'path', 'description'), or null when it has none.
+     * The project's folder as array('id', 'name', 'path', 'description'), or null when it has none. Also null when the folder, or
+     * a folder above it, is hidden from the viewer (anyone but an admin), so no badge, message or link names it.
      */
     public function getFolder($projectId)
     {
         $folderId = $this->sortaFolderModel->getFolderId($projectId);
         $folder = $folderId > 0 ? $this->sortaFolderModel->getById($folderId) : null;
 
-        if ($folder === null) {
+        if ($folder === null || isset($this->sortaFolderModel->getViewerHiddenIds()[(int) $folder['id']])) {
             return null;
         }
 
         return array(
             'id'   => $folder['id'],
-            'name' => $folder['name'],
+            'name' => $this->sortaFolderModel->getDisplayName($folder),
             'path' => $this->sortaFolderModel->getPathLabel($folder['id']),
             'description' => $folder['description'],
         );
+    }
+
+    /**
+     * The folder's name for a template, with " (hidden)" added when an admin looks at a hidden folder. Escape it on output.
+     */
+    public function folderName(array $folder)
+    {
+        return $this->sortaFolderModel->getDisplayName($folder);
+    }
+
+    /**
+     * Whether the project sits in a folder hidden from the viewer, so its folder is not the viewer's to see or change.
+     */
+    public function isHiddenProject($projectId)
+    {
+        return in_array((int) $projectId, $this->sortaFolderModel->getHiddenProjectIds(), true);
+    }
+
+    /**
+     * Ids of the projects sorted into a folder hidden from the viewer. BusyBee leaves them out of the blockers it names.
+     */
+    public function hiddenProjectIds()
+    {
+        return $this->sortaFolderModel->getHiddenProjectIds();
+    }
+
+    /**
+     * The address parameters of a link to a folder page. An admin opens every folder through the All folders view, which a folder
+     * holding none of the admin's own projects needs, so the link keeps scope=all on that view and on every page that is not
+     * the folder page (a project, the notes). Anyone else opens only their own view.
+     */
+    public function folderParams($folderId)
+    {
+        $params = array('plugin' => 'SortaFolders', 'folder_id' => (int) $folderId);
+
+        if ($this->userSession->isAdmin() && ($this->router->getController() !== 'FolderController' || $this->request->getStringParam('scope') === 'all')) {
+            $params['scope'] = 'all';
+        }
+
+        return $params;
     }
 }

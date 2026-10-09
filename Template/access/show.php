@@ -3,7 +3,7 @@
 </div>
 
 <p class="alert alert-info">
-    <?= $this->sortaFolders->t('A user or group listed here gets this role on every project in this folder and its subfolders, now and for projects filed here later. Access added this way is taken away again when the project leaves the folder or the access is removed here. Memberships that someone added by hand are never changed or removed. Personal projects are left out.') ?>
+    <?= $this->sortaFolders->t('A user or group listed here gets this role on every project in this folder and its subfolders, now and for projects sorted here later. Access added this way is taken away again when the project leaves the folder or the access is removed here. Memberships that someone added by hand are never changed or removed. Personal projects are left out.') ?>
 </p>
 
 <?php if (empty($grants)): ?>

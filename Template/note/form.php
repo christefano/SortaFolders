@@ -1,5 +1,5 @@
 <div class="page-header">
-    <h2><?= $this->sortaFolders->t('Add folder note') ?>: <?= $this->text->e($folder['name']) ?></h2>
+    <h2><?= $this->sortaFolders->t('Add folder note') ?>: <?= $this->text->e($this->sortaFolders->folderName($folder)) ?></h2>
 </div>
 <form method="post" action="<?= $this->url->href('NoteController', 'save', array('plugin' => 'SortaFolders', 'folder_id' => $folder['id'], 'return' => 'show')) ?>" autocomplete="off">
     <?= $this->form->csrf() ?>

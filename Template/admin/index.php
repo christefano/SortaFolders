@@ -32,9 +32,9 @@
                                 <i class="fa fa-<?= $this->sortaFolders->icon() ?> fa-fw" aria-hidden="true"></i>
                                 <span class="sortafolders-sr"><?= t('Level %d', (int) $item['depth']) ?>:</span>
                                 <?php if (isset($linkable[(int) $folder['id']])): ?>
-                                    <?= $this->url->link($this->text->e($folder['name']), 'FolderController', 'show', array('plugin' => 'SortaFolders', 'folder_id' => $folder['id'])) ?>
+                                    <?= $this->url->link($this->text->e($this->sortaFolders->folderName($folder)), 'FolderController', 'show', array('plugin' => 'SortaFolders', 'folder_id' => $folder['id'])) ?>
                                 <?php else: ?>
-                                    <?= $this->text->e($folder['name']) ?>
+                                    <?= $this->text->e($this->sortaFolders->folderName($folder)) ?>
                                 <?php endif ?>
                             </span>
                         </td>
@@ -90,7 +90,7 @@
                             <span style="margin-left: <?= ((int) $item['depth'] - 1) * 1.5 ?>em">
                                 <i class="fa fa-<?= $this->sortaFolders->icon() ?> fa-fw" aria-hidden="true"></i>
                                 <span class="sortafolders-sr"><?= t('Level %d', (int) $item['depth']) ?>:</span>
-                                <?= $this->text->e($folder['name']) ?>
+                                <?= $this->text->e($this->sortaFolders->folderName($folder)) ?>
                             </span>
                         </td>
                         <td>
@@ -147,7 +147,7 @@
                     <option value="<?= (int) $id ?>" <?= in_array($id, $hidden_ids, true) ? 'selected' : '' ?>><?= $this->text->e($label) ?></option>
                 <?php endforeach ?>
             </select>
-            <p class="form-help"><?= $this->sortaFolders->t('A hidden folder and the folders inside it leave My folders, All folders, the folder pickers and the BigBoard folder menu. Projects stay where they are. Settings still lists them. Hold Ctrl or Cmd to pick more than one.') ?></p>
+            <p class="form-help"><?= $this->sortaFolders->t('A hidden folder, the folders inside it, and their projects are hidden from everyone but admins, who see everything. Projects stay where they are. Settings still lists the folders. Hold Ctrl or Cmd to pick more than one.') ?></p>
         <?php endif ?>
     </fieldset>
 

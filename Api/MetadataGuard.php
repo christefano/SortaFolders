@@ -87,6 +87,10 @@ class MetadataGuard extends Base
             throw new AccessDeniedException('Only a project manager can change the folder');
         }
 
+        if (in_array($projectId, $this->sortaFolderModel->getHiddenProjectIds(), true)) {
+            throw new AccessDeniedException('Folder Access Denied');
+        }
+
         $options = $this->sortaFolderModel->getFolderOptionsForUser($userId, $this->sortaFolderModel->getFolderId($projectId));
 
         if (! isset($options[$folderId])) {

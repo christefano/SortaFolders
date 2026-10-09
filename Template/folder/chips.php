@@ -8,6 +8,7 @@ $chipsAction = isset($chips_action) ? $chips_action : 'show';
 $kind = isset($kind) ? $kind : 'projects';
 $counts = isset($counts) ? $counts : array();
 $bb = isset($bb) ? $bb : null;
+$token = $this->app->getToken()->getReusableCSRFToken();  // lets a tab link save the tab (see DashboardHelper::filter)
 ?>
 <div class="table-list sortafolders-tabs">
 <div class="views-switcher-component">
@@ -25,7 +26,7 @@ $bb = isset($bb) ? $bb : null;
             <?php endif ?>
             <?php
             $empty = $key !== 'all' && isset($counts[$key]) && (int) $counts[$key] === 0;
-            $filterUrl = $this->url->href($chipsController, $chipsAction, $url_params + array('filter' => $key));
+            $filterUrl = $this->url->href($chipsController, $chipsAction, $url_params + array('filter' => $key, 'csrf_token' => $token));
             $search = $bb !== null ? $this->sortaFolders->tabSearch($key) : '';
             $classes = trim(($filter === $key ? 'active ' : '').($empty ? 'sortafolders-tab-off' : ''));
             ?>
@@ -48,7 +49,7 @@ $bb = isset($bb) ? $bb : null;
         <?php endforeach ?>
     </ul>
     <?php if ($filter !== 'all'): ?>
-        <a class="sortafolders-clear" href="<?= $this->url->href($chipsController, $chipsAction, $url_params + array('filter' => 'all')) ?>" title="<?= t('View the whole list.') ?>"><?= t('Clear') ?></a>
+        <a class="sortafolders-clear" href="<?= $this->url->href($chipsController, $chipsAction, $url_params + array('filter' => 'all', 'csrf_token' => $token)) ?>" title="<?= t('View the whole list.') ?>"><?= t('Clear') ?></a>
     <?php endif ?>
 </div>
 </div>

@@ -78,16 +78,18 @@
         });
     }
 
-    // Kanboard has no hook right under "Edit project", so the project sidebar item is moved there.
+    // Kanboard has no hook right under "Edit project", so the project sidebar items are moved there: "Edit folder", then "View folder".
     function moveProjectItem() {
-        var item = document.querySelector('.sidebar li[data-sortafolders="project-item"]');
+        var items = document.querySelectorAll('.sidebar li[data-sortafolders="project-item"], .sidebar li[data-sortafolders="project-folder-link"]');
 
-        if (!item) {
+        if (!items.length) {
             return;
         }
 
-        // Shown again whether or not "Edit project" is found, so the item can't stay hidden.
-        item.classList.add('sortafolders-placed');
+        // Shown again whether or not "Edit project" is found, so the items can't stay hidden.
+        for (var n = 0; n < items.length; n++) {
+            items[n].classList.add('sortafolders-placed');
+        }
 
         var links = document.querySelectorAll('.sidebar li > a');
 
@@ -95,7 +97,13 @@
             var href = links[i].getAttribute('href') || '';
 
             if (/\/project\/\d+\/edit(\?|$)|controller=ProjectEditController/.test(href)) {
-                links[i].parentNode.parentNode.insertBefore(item, links[i].parentNode.nextSibling);
+                var anchor = links[i].parentNode;
+
+                for (var m = 0; m < items.length; m++) {
+                    anchor.parentNode.insertBefore(items[m], anchor.nextSibling);
+                    anchor = items[m];
+                }
+
                 return;
             }
         }

@@ -4,7 +4,7 @@
 
 <div class="confirm">
     <p class="alert alert-info">
-        <?= $this->sortaFolders->t('Do you really want to remove this folder: "%s"?', $folder['name']) ?>
+        <?= $this->sortaFolders->t('Do you really want to remove this folder: "%s"?', $this->sortaFolders->folderName($folder)) ?>
     </p>
     <p><?= $this->sortaFolders->t('Its subfolders and projects move up one level. No project is deleted.') ?></p>
     <?php if ($grants > 0): ?>

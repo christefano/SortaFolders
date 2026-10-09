@@ -1,6 +1,17 @@
 <div class="page-header">
     <?php if ($focus_path !== ''): ?>
-        <h2><?= t('Everything for') ?> <strong><?= $this->text->e($focus_path) ?></strong></h2>
+        <h2 class="sortafolders-path">
+            <?= $this->url->link($this->sortaFolders->t('Project folders'), 'FolderController', 'show', array('plugin' => 'SortaFolders', 'scope' => $all ? 'all' : null)) ?>
+            &rsaquo;
+            <?php foreach ($focus_parts as $i => $part): ?>
+                <?= $i > 0 ? ' / ' : '' ?>
+                <?php if ($i < count($focus_parts) - 1): ?>
+                    <?= $this->url->link($this->text->e($part['name']), 'FolderController', 'show', $this->sortaFolders->folderParams($part['id'])) ?>
+                <?php else: ?>
+                    <strong><?= $this->text->e($part['name']) ?></strong>
+                <?php endif ?>
+            <?php endforeach ?>
+        </h2>
     <?php else: ?>
         <h2>
             <?= $this->text->e($all ? $this->sortaFolders->t('All folders') : $this->sortaFolders->t('My folders')) ?>
@@ -10,10 +21,6 @@
 </div>
 
 <?php if ($focus_path !== ''): ?>
-    <p class="sortafolders-path">
-        <?= $this->url->link($this->sortaFolders->t('Project folders'), 'FolderController', 'show', array('plugin' => 'SortaFolders')) ?>
-        &rsaquo; <strong><?= $this->text->e($focus_path) ?></strong>
-    </p>
     <?php if ($focus_description !== ''): ?>
         <p class="sortafolders-description"><?= $this->text->e($focus_description) ?></p>
     <?php endif ?>

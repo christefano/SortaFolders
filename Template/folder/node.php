@@ -1,7 +1,7 @@
 <details class="sortafolders-node" data-folder="<?= (int) $node['folder']['id'] ?>" open>
     <summary class="table-list-row table-border-left sortafolders-folder">
         <i class="fa fa-<?= $this->sortaFolders->icon(true) ?> fa-fw" aria-hidden="true"></i>
-        <strong><?= $this->text->e($node['folder']['name']) ?></strong>
+        <strong><?= $this->text->e($this->sortaFolders->folderName($node['folder'])) ?></strong>
         <?php if ((int) $node['folder']['id'] > 0 && $node['folder']['description'] !== ''): ?>
             <span class="sortafolders-info"><?= $this->app->tooltipMarkdown($node['folder']['description']) ?></span>
         <?php endif ?>

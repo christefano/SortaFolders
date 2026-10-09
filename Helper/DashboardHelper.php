@@ -72,8 +72,8 @@ class DashboardHelper extends Base
     }
 
     /**
-     * The filter tab in force, read from the address and kept in the user's metadata for each page, so the
-     * paginator's own Previous and Next links, which drop it, keep the list narrowed.
+     * The filter tab in force, read from the address and, when the address carries the token the tab links add, kept in the user's
+     * metadata for each page, so the paginator's own Previous and Next links, which drop it, keep the list narrowed.
      */
     public function filter($page)
     {
@@ -86,10 +86,14 @@ class DashboardHelper extends Base
         $asked = $this->request->getStringParam('filter', '');
 
         if ($asked !== '' && in_array($asked, $known, true)) {
-            if ($asked === 'all') {
-                $this->userMetadataModel->remove($viewer, self::FILTER_KEY.$page);
-            } else {
-                $this->userMetadataModel->save($viewer, array(self::FILTER_KEY.$page => $asked));
+            // The tab in the address is honored for this request. It is saved only when the address carries the token the tab
+            // links add, so a link on another site cannot change the tab a user has saved.
+            if ($this->token->validateReusableCSRFToken($this->request->getStringParam('csrf_token', ''))) {
+                if ($asked === 'all') {
+                    $this->userMetadataModel->remove($viewer, self::FILTER_KEY.$page);
+                } else {
+                    $this->userMetadataModel->save($viewer, array(self::FILTER_KEY.$page => $asked));
+                }
             }
 
             return $this->filters[$page] = $asked;
@@ -98,6 +102,20 @@ class DashboardHelper extends Base
         $saved = (string) $this->userMetadataModel->get($viewer, self::FILTER_KEY.$page, 'all');
 
         return $this->filters[$page] = (in_array($saved, $known, true) ? $saved : 'all');
+    }
+
+    /**
+     * Leaves the projects in a hidden folder out of one of core's dashboard lists, whatever tab is open: $column is the project id
+     * column of the list's query. Does nothing for an admin, who sees everything. Applied by the plugin's pagination hooks to My
+     * projects, My tasks, My subtasks and the Overview.
+     */
+    public function hide($column, $query)
+    {
+        $ids = $this->sortaFolderModel->getHiddenProjectIds();
+
+        if (! empty($ids)) {
+            $query->notIn($column, $ids);
+        }
     }
 
     /**
@@ -169,7 +187,7 @@ class DashboardHelper extends Base
     }
 
     /**
-     * The user's active projects keyed by id, each with "sf_path", the folder path the answer rows show.
+     * The user's active projects keyed by id, each with "sf_path", the folder path the answer rows show, and "sf_folder_id" (0 when the project is not in a folder), which tells two folders with the same name apart.
      */
     public function scope($userId)
     {
@@ -178,9 +196,10 @@ class DashboardHelper extends Base
         }
 
         $projects = array();
+        $hidden = array_flip($this->sortaFolderModel->getHiddenProjectIds());
 
         foreach ($this->projectModel->getAllByIds($this->projectPermissionModel->getActiveProjectIds($userId)) as $project) {
-            if ((int) $project['is_active'] === 1) {
+            if ((int) $project['is_active'] === 1 && ! isset($hidden[(int) $project['id']])) {
                 $projects[(int) $project['id']] = $project;
             }
         }
@@ -189,6 +208,7 @@ class DashboardHelper extends Base
 
         foreach ($projects as $id => $project) {
             $projects[$id]['sf_path'] = isset($assignments[$id]) ? $this->sortaFolderModel->getPathLabel($assignments[$id]) : $this->helper->sortaFolders->t('No folder');
+            $projects[$id]['sf_folder_id'] = isset($assignments[$id]) ? (int) $assignments[$id] : 0;
         }
 
         return $this->scopes[(int) $userId] = $projects;

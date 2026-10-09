@@ -33,7 +33,7 @@ class NoteModel extends Base
     }
 
     /**
-     * Ids of the active projects the user is a member of (directly or through a group) filed in this folder itself.
+     * Ids of the active projects the user is a member of (directly or through a group) sorted into this folder itself.
      * Projects in its subfolders don't count: a folder above the user's own is one they have no access to.
      */
     private function visibleProjectIds($userId, $folderId)
@@ -52,13 +52,18 @@ class NoteModel extends Base
 
     /**
      * Whether the user can see a folder: admins see every folder, others see one they made or one with an active project
-     * of theirs filed in it, the same rule the folder lists use.
+     * of theirs sorted into it, the same rule the folder lists use.
      */
     public function canRead($userId, $isAdmin, $folderId)
     {
         $folder = $this->sortaFolderModel->getById($folderId);
 
         if ($folder === null) {
+            return false;
+        }
+
+        // A hidden folder's notes are for admins only, the folder's maker and its members included.
+        if (! $isAdmin && isset($this->sortaFolderModel->getHiddenIds()[(int) $folderId])) {
             return false;
         }
 
@@ -74,6 +79,10 @@ class NoteModel extends Base
 
         if ($isAdmin) {
             return true;
+        }
+
+        if (isset($this->sortaFolderModel->getHiddenIds()[(int) $folderId])) {
+            return false;
         }
 
         foreach ($this->visibleProjectIds($userId, $folderId) as $projectId) {

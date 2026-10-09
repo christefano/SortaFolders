@@ -119,7 +119,8 @@ details:not([open]) > .sortafolders-line .sortafolders-extra {
 }
 
 /* Hidden until the script has moved the project sidebar item, so it does not jump. The script adds the class itself, so a page without it shows the item where the hook put it. */
-.sortafolders-js .sidebar li[data-sortafolders="project-item"]:not(.sortafolders-placed) {
+.sortafolders-js .sidebar li[data-sortafolders="project-item"]:not(.sortafolders-placed),
+.sortafolders-js .sidebar li[data-sortafolders="project-folder-link"]:not(.sortafolders-placed) {
     visibility: hidden;
 }
 
@@ -228,8 +229,8 @@ li.sortafolders-meta {
 .sortafolders-legend { margin: 0.5em 0 1em; font-size: 0.9em; }
 .sortafolders-legend .fa { margin-left: 1em; }
 .sortafolders-none { opacity: 0.7; }
-/* Space between the breadcrumb and what follows it. */
-.sortafolders-path { margin: 0 0 1em; }
+/* The breadcrumb is the page title, so it keeps the heading's size. */
+.sortafolders-path { font-weight: normal; }
 /* The author and date sit inline at the end of the note text. */
 .sortafolders-note-by { margin-left: 0.5em; font-size: 0.85em; white-space: nowrap; }
 /* A folder with no note has only the links, so they sit at the left edge. */
@@ -288,3 +289,6 @@ summary.sortafolders-folder .sortafolders-meta { display: inline-block; vertical
 /* Zebra stripes on the folder and project rows: every second row among its siblings. */
 .sortafolders-tree .sortafolders-project:nth-child(even),
 .sortafolders-tree .sortafolders-node:nth-child(even) > .sortafolders-folder { background: color-mix(in srgb, currentColor 6%, transparent); }
+
+/* The View folder link sits first in the line under a folder's bar, so nothing interactive sits inside the bar. */
+.sortafolders-note-view { flex: none; font-size: 0.85em; white-space: nowrap; }

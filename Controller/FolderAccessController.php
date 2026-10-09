@@ -16,7 +16,7 @@ class FolderAccessController extends BaseController
         $folder = $this->getFolder();
         $grants = array();
 
-        // Repairs any filing that never ran a sync (audit F6), and drops grants whose user or group is gone.
+        // Repairs any sort that never ran a sync (audit F6), and drops grants whose user or group is gone.
         try {
             $this->sortaAccessModel->sync();
         } catch (\Throwable $e) {

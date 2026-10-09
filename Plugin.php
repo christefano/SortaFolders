@@ -88,7 +88,7 @@ class Plugin extends Base
                     $folderId = (int) $form['sortafolders_folder_id'];
                     $options = $container['sortaFolderModel']->getFolderOptionsForUser($userId);
 
-                    // A folder the user cannot see is dropped, so a forged post files nothing.
+                    // A folder the user cannot see is dropped, so a forged post sorts nothing.
                     if (! isset($options[$folderId])) {
                         return;
                     }
@@ -100,7 +100,7 @@ class Plugin extends Base
                         $since
                     );
                 } catch (\Throwable $e) {
-                    $container['logger']->error('SortaFolders: could not file the new project: '.$e->getMessage());
+                    $container['logger']->error('SortaFolders: could not sort the new project: '.$e->getMessage());
                 }
             });
         }
@@ -122,8 +122,14 @@ class Plugin extends Base
         foreach (array('project' => 'projects', 'task' => 'tasks', 'subtask' => 'subtasks') as $hook => $page) {
             $this->hook->on('pagination:dashboard:'.$hook.':query', function ($query) use ($container, $page) {
                 $container['helper']->sortaDashboard->narrow($page, $query);
+                $container['helper']->sortaDashboard->hide($page === 'projects' ? 'projects.id' : 'tasks.project_id', $query);
             });
         }
+
+        // BigBoard's own hook: the project ids it lists and lets a user select. A project in a folder hidden from the viewer goes.
+        $this->hook->on('bigboard:projects:ids', function (&$ids) use ($container) {
+            $ids = array_values(array_diff(array_map('intval', $ids), $container['sortaFolderModel']->getHiddenProjectIds()));
+        });
 
         $this->template->hook->attach('template:config:sidebar', 'SortaFolders:hook/config_sidebar');
         $this->template->hook->attach('template:project-list:menu:after', 'SortaFolders:hook/project_list_menu');
@@ -139,8 +145,10 @@ class Plugin extends Base
     }
 
     /**
-     * BigBoard's own strings ("Portfolio group") follow the selected term without BigBoard knowing.
+     * BigBoard's own strings ("Portfolio group", "Selected projects") follow the selected term without BigBoard knowing, and "Ungrouped projects" becomes "Unsorted projects" with every term.
      * Translator::$locales is public and checked before the English text, so adding a key here wins.
+     * mrsuner's BigBoard reads its group list from PortfolioDashboard's PortfolioProjectModel, so that name is made to
+     * point at FolderModel, which has the same getProjectGrouping(), unless PortfolioDashboard is really installed.
      */
     public function onStartup()
     {
@@ -153,6 +161,14 @@ class Plugin extends Base
         $singular = $terms[$key][0];
         $plural = $terms[$key][1];
 
+        $portfolioModel = 'Kanboard\\Plugin\\PortfolioDashboard\\Model\\PortfolioProjectModel';
+
+        if (! class_exists($portfolioModel)) {
+            class_alias('Kanboard\\Plugin\\SortaFolders\\Model\\FolderModel', $portfolioModel);
+        }
+
+        \Kanboard\Core\Translator::$locales['Selected projects'] = 'Selected '.$plural;
+        \Kanboard\Core\Translator::$locales['Ungrouped projects'] = 'Unsorted projects';
         \Kanboard\Core\Translator::$locales['Portfolio group'] = ucfirst($plural);
         \Kanboard\Core\Translator::$locales['Portfolio groups'] = ucfirst($plural);
         \Kanboard\Core\Translator::$locales['No accessible projects are available in this portfolio group.'] = 'No accessible projects are available in this '.$singular.'.';
@@ -175,7 +191,7 @@ class Plugin extends Base
 
     public function getPluginVersion()
     {
-        return '1.0.0';
+        return '1.0.1';
     }
 
     public function getPluginHomepage()

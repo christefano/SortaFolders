@@ -43,7 +43,7 @@ class AccessModel extends Base
     }
 
     /**
-     * Who can open the projects filed directly in each folder, for the Access report on the settings page. Folder
+     * Who can open the projects sorted directly into each folder, for the Access report on the settings page. Folder
      * id => array(projects => count, users => distinct users with a role there, rows => the users and groups).
      * A row is array(kind user|group, name, role text, given (a grant added it), by_hand (someone added it), from
      * (where the grant is), members (a group's size)). Admins are left out, closed and personal projects are not
@@ -345,7 +345,7 @@ class AccessModel extends Base
     }
 
     /**
-     * What filing a project into each folder would give, for the forms where a manager picks a folder.
+     * What sorting a project into each folder would give, for the forms where a manager picks a folder.
      * A folder carries its own grants and those of every folder above it.
      *
      * @return array folder id => list of array(user_id, name, role), user_id 0 for a group, folders with none left out

@@ -57,7 +57,7 @@ function version_4(PDO $pdo)
 
 function version_5(PDO $pdo)
 {
-    // Who created a folder, so a Project Manager can file a project into a folder they made before it holds a project.
+    // Who created a folder, so a Project Manager can sort a project into a folder they made before it holds a project.
     $pdo->exec('ALTER TABLE sortafolders_groups ADD COLUMN created_by INT NOT NULL DEFAULT 0');
 
     // Status notes: a short, dated note with a green, yellow or red flag on a folder.

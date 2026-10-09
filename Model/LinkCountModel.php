@@ -7,7 +7,8 @@ use Kanboard\Core\Base;
 /**
  * Counts for the tab bars on the dashboard pages. Every method takes the ids of the projects the viewer can see on that page
  * and reads nothing else, so a hidden project never counts. marks(), mine() and blockedCount() are small copies of the
- * ones in BusyBee's AnswerModel: a plugin should not reach into another plugin's private methods, and the tests catch drift.
+ * ones in BusyBee's AnswerModel: a plugin should not reach into another plugin's private methods. The harness script scen10.sh
+ * (cmpcounts.php) compares this model's overdue, unowned, blocked and stuck counts with BusyBee's for every narrowing, so a copy that drifts fails there.
  */
 class LinkCountModel extends Base
 {
@@ -56,16 +57,16 @@ class LinkCountModel extends Base
 
         $now = time();
         $extra = $this->mine($mine);
-        $moved = '(CASE WHEN t.date_moved > 0 THEN t.date_moved ELSE t.date_creation END)';
+        $moved = '(CASE WHEN t.date_moved > 0 THEN t.date_moved ELSE t.date_creation END)';  // the limit below is written into the SQL: SQLite compares a bound text value as larger than any number, which counted every task as stuck
         $sql = 'SELECT
                     SUM(CASE WHEN t.date_due > 0 AND t.date_due < ? THEN 1 ELSE 0 END) AS n_overdue,
                     SUM(CASE WHEN t.date_due >= ? AND t.date_due < ? THEN 1 ELSE 0 END) AS n_today,
                     SUM(CASE WHEN t.date_due >= ? AND t.date_due <= ? THEN 1 ELSE 0 END) AS n_soon,
                     SUM(CASE WHEN t.owner_id = 0 THEN 1 ELSE 0 END) AS n_unowned,
-                    SUM(CASE WHEN '.$moved.' BETWEEN 1 AND ? THEN 1 ELSE 0 END) AS n_stuck,
+                    SUM(CASE WHEN '.$moved.' BETWEEN 1 AND '.((int) ($now - self::STUCK_DAYS * 86400)).' THEN 1 ELSE 0 END) AS n_stuck,
                     SUM(CASE WHEN t.owner_id = ? THEN 1 ELSE 0 END) AS n_mine
                 FROM tasks t WHERE t.is_active = 1 AND t.project_id IN ('.$this->marks($ids).')'.$extra[0];
-        $params = array_merge(array($now, strtotime('today'), strtotime('tomorrow'), $now, $now + (int) $soonDays * 86400, $now - self::STUCK_DAYS * 86400, (int) $userId), $ids, $extra[1]);
+        $params = array_merge(array($now, strtotime('today'), strtotime('tomorrow'), $now, $now + (int) $soonDays * 86400, (int) $userId), $ids, $extra[1]);
         $row = $this->db->execute($sql, $params)->fetch(\PDO::FETCH_ASSOC);
 
         return array('overdue' => (int) $row['n_overdue'], 'today' => (int) $row['n_today'], 'soon' => (int) $row['n_soon'], 'unowned' => (int) $row['n_unowned'], 'blocked' => $this->blockedCount($ids, $mine), 'stuck' => (int) $row['n_stuck'], 'mine' => (int) $row['n_mine']);

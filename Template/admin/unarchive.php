@@ -4,7 +4,7 @@
 
 <div class="confirm">
     <p class="alert alert-info">
-        <?= $this->sortaFolders->t('Do you really want to unarchive this folder: "%s"?', $folder['name']) ?>
+        <?= $this->sortaFolders->t('Do you really want to unarchive this folder: "%s"?', $this->sortaFolders->folderName($folder)) ?>
     </p>
 
     <?php if (empty($projects)): ?>

@@ -70,6 +70,9 @@ class FolderController extends BaseController
             }
         }
 
+        // Projects in a folder hidden from the viewer (anyone but an admin) are not part of any view here.
+        $projects = array_diff_key($projects, array_flip($this->sortaFolderModel->getHiddenProjectIds()));
+
         $health = $this->sortaHealthModel;
         $settings = $health->getSettings();
         $totals = $this->sortaFolderModel->getTaskTotals(array_keys($projects), $settings['soon_days'], $this->userSession->getId());
@@ -84,6 +87,7 @@ class FolderController extends BaseController
             $projects[$id]['sf_health'] = $health->assess($projects[$id]['sf_totals'], (int) $project['last_modified'], $settings);
             $projects[$id]['sf_spark'] = $sparks[$id];
             $projects[$id]['sf_path'] = isset($assignments[$id]) ? $this->sortaFolderModel->getPathLabel($assignments[$id]) : $helper->t('No folder');
+            $projects[$id]['sf_folder_id'] = isset($assignments[$id]) ? (int) $assignments[$id] : 0;
         }
 
         $filter = $this->getFilter();
@@ -245,6 +249,7 @@ class FolderController extends BaseController
             'loose'         => $looseNode,
             'paginator'     => $paginator,
             'focus_path'    => $focus === null ? '' : $this->sortaFolderModel->getPathLabel($focus['folder']['id']),
+            'focus_parts'   => $focus === null ? array() : $this->sortaFolderModel->getPathParts($focus['folder']['id']),
             'focus_description' => $focus === null ? '' : $focus['folder']['description'],
             'all'           => $all,
             'folder_count'  => $this->countNodes($nodes),
@@ -262,8 +267,8 @@ class FolderController extends BaseController
     }
 
     /**
-     * The viewer's filter. A `filter` parameter wins and is remembered (in user metadata, so no schema),
-     * `filter=all` forgets it, and with no parameter the remembered one is used. Anything unknown is "all".
+     * The viewer's filter. A `filter` parameter wins for this request. With the token the tab links add it is also remembered (in user
+     * metadata, so no schema) and `filter=all` forgets it. With no parameter the remembered one is used. Anything unknown is "all".
      */
     private function getFilter()
     {
@@ -274,7 +279,8 @@ class FolderController extends BaseController
         if ($asked !== '') {
             $filter = in_array($asked, $known, true) ? $asked : 'all';
 
-            if (in_array($asked, $known, true)) {
+            // Honored for this request. Saved only when the address carries the token the tab links add, so a link on another site cannot change it.
+            if (in_array($asked, $known, true) && $this->token->validateReusableCSRFToken($this->request->getStringParam('csrf_token', ''))) {
                 if ($filter === 'all') {
                     $this->userMetadataModel->remove($userId, self::FILTER_KEY);
                 } else {

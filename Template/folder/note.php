@@ -1,6 +1,9 @@
 <?php $note = empty($node['note']) ? null : $node['note'] ?>
 <?php $parts = $note ? $this->sortaFolders->flagParts($note['flag']) : array() ?>
 <div class="sortafolders-note<?= $note ? ' sortafolders-note-'.$this->text->e($note['flag']) : ' sortafolders-note-bare' ?>">
+    <?php if (! empty($node['can_view'])): ?>
+        <small class="sortafolders-note-view"><?= $this->url->link($this->sortaFolders->t('View folder'), 'FolderController', 'show', $this->sortaFolders->folderParams($node['folder']['id']), false, '', $this->sortaFolders->t('View this folder.')) ?></small>
+    <?php endif ?>
     <?php if ($note): ?>
         <div class="sortafolders-note-main">
             <?php if ($parts): ?>
@@ -19,7 +22,7 @@
                 <?php endif ?>
                 <li><a href="<?= $this->url->href('NoteController', 'index', array('plugin' => 'SortaFolders', 'folder_id' => $node['folder']['id'])) ?>"><?= $this->sortaFolders->t('View notes') ?></a></li>
                 <?php if (! empty($node['can_view'])): ?>
-                    <li><a href="<?= $this->url->href('FolderController', 'show', array('plugin' => 'SortaFolders', 'folder_id' => $node['folder']['id'])) ?>"><?= $this->sortaFolders->t('View folder') ?></a></li>
+                    <li><a href="<?= $this->url->href('FolderController', 'show', $this->sortaFolders->folderParams($node['folder']['id'])) ?>"><?= $this->sortaFolders->t('View folder') ?></a></li>
                 <?php endif ?>
                 <?php if ($this->user->hasAccess('FolderAdminController', 'edit')): ?>
                     <li><a href="<?= $this->url->href('FolderAdminController', 'edit', array('plugin' => 'SortaFolders', 'folder_id' => $node['folder']['id'], 'return' => 'show')) ?>" class="js-modal-medium"><?= $this->sortaFolders->t('Edit folder') ?></a></li>

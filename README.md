@@ -1,8 +1,8 @@
-# SortaFolders v1.0.0
+# SortaFolders v1.0.1
 
 *SortaFolders* is a Kanboard plugin that sorts projects into folders. Kanboard doesn't let you group projects together or classify a project by putting it in another project, so *SortaFolders* adds nestable folders up to 5 levels deep and a dedicated *My folders* page on your dashboard that lists your projects by folder.
 
-With *SortaFolders*, admins and project managers can sort their projects into folders, add a note per folder, add folder descriptions, and grant access to users and groups who are in a project to the other projects in that same folder.
+With *SortaFolders*, admins and project managers can sort their projects into folders, add a note per folder, and add folder descriptions, and admins can grant access to users and groups who are in a project to the other projects in that same folder.
 
 Admins can also change the icon used to represent folders from a list of options, hide folders from view, and change the site-wide term *SortaFolders* uses for folders to Clients, Departments, Folders (*default*), Portfolios, Products, Programs, Project groups, and Spaces. For example, I like to pair the "Spaces" with the globe icon and "Portfolio" with the briefcase icon on my Kanboard sites.
 
@@ -11,13 +11,24 @@ On the *My folders* page, any user of any project that's sorted in a folder can 
 *SortaFolders* works without any other plugins installed, but if you have the [BigBoard fork by mrsuner](https://github.com/mrsuner/kanboard_plugin_bigboard) installed, *SortaFolders* adds a row of BigBoard links and tabs to all your *My* dashboard pages.
 
 
+## Screenshots
+
+The *My folders* page at `/folders` shows your projects grouped by folder. Select *View folder* or use the `…` menu to open it.
+
+![SortaFolders My folders page with folders, projects, and filter tabs](screenshots/my-folders.jpg)
+
+*Settings -> SortaFolders* lists every folder with its project count and all the admin actions.
+
+![SortaFolders settings page listing folders with project counts and actions](screenshots/sortafolders-settings.jpg)
+
+
 ## Quick start
 
 1. Copy the `SortaFolders` folder into Kanboard's `plugins/` directory.
 2. Open *Settings -> SortaFolders* (or select "Folders management" from the avatar menu) as an admin, and click "New folder". Add subfolders from the same page, from the main header menu, or from the "+" menu.
 3. Open a project, click "Configure this project", click "Edit folder" in the project settings sidebar, choose a folder, and click "Save".
 4. Click *My folders* in the dashboard sidebar to see your projects sorted by folder.
-5. To put a project into a folder as you create it, choose a folder on the New project form.
+5. To sort a project into a folder as you create it, choose a folder in the New project form.
 
 [INSTALL.md](INSTALL.md) covers the requirements, removal, and compatibility.
 
@@ -25,11 +36,12 @@ On the *My folders* page, any user of any project that's sorted in a folder can 
 ## Folders and folder notes
 
 - Folders can be nested up to 5 levels deep.
-- Admins and project managers create folders. A project manager chooses a parent from the folders they can see. Only admins can rename, move, reorder and remove folders. Edit a folder to rename it or to choose a different parent folder, and use the up and down arrows to change its order.
+- Admins and project managers can create folders. A project manager chooses a parent folder from the folders they can see. Only admins can rename, move, reorder and remove folders. Edit a folder to rename it or to choose a different parent folder, and use the up and down arrows to change its order.
 - Removing a folder deletes nothing but the folder. Its subfolders and projects move up one level, and projects in a top level folder end up in the "No folder" section.
 - A folder note is a short text note (up to 280 characters) with a configurable green, yellow, or red flag that appears on the *My folders* page. Admins and project managers with a project sorted in a folder can add a note to the folder, and anyone with a project sorted in that folder can see it. A project's Edit folder page shows a history of that folder's notes. Removing a folder also removes its notes.
-- A "Hidden folders" list on the admin settings page hides a folder, its subfolders, and the projects sorted in them from the admin folders page, *My folders*, the folder pickers, and BigBoard's group switcher. This is helpful for  test projects and related test folders. Hidden folders are visible on the admin page under "Access" and in Kanboard's own project lists.
-- A folder can have a description up to 2000 characters (Markdown is supported). The folder description shows in the info icon's hover text on the folder page, just like Kanboard's project descriptions.
+- A "Hidden folders" list on the admin settings page hides a folder, its subfolders, and the projects sorted in them from everyone but admins (who see everything).
+- Admins can see hidden folders and any folders inside of them as *Name (hidden)*. The admin settings page still lists every hidden folder in the folder list and in the "Access" section.
+- A folder can have a description up to 2,000 characters, and Markdown is supported. The folder description shows in the info icon's hover text on the folder page, just like Kanboard's project descriptions.
 - "Archive" on the admin settings page will close every active project (including personal projects) sorted in the to-be-archived folder. All the tasks are left alone, and just the project is closed. "Unarchive" will undo it and reopens every closed project in the folder and its subfolders. A project can also be reopened on Kanboard's Projects page.
 
 
@@ -38,18 +50,24 @@ On the *My folders* page, any user of any project that's sorted in a folder can 
 - A project is highlighted in red and shows an alert when its open tasks that are overdue reaches a configurable percentage, or when it has been quiet for a configurable number of days. It is highlighted in yellow when it has an overdue task, a task due soon, or has been quiet for a configurable number of days. Otherwise it is highlighted in green. A project with no open task has no project health and says "No open tasks".
 - "Quiet" is the days since the project's last task activity. A project at or past a configurable number of days shows "Quiet for N days".
 - The four configurable project health numbers are on the *Settings -> SortaFolders* admin settings page: the red percentage (25), the red quiet days (30), the yellow quiet days (14) and how many days count as "due soon" (7).
-- A "Projects in folders needing attention" section above the folders displays up to 5 "red" or "yellow" projects if there are any. "Red" first, then the most overdue, then the longest quiet, and with the folder path and the reason. Turn it on or off under "Project health" on the admin settings page. 
+- A "Projects in folders needing attention" section displays up to 5 "red" or "yellow" projects if there are any. "Red" first, then the most overdue, then the longest quiet, and with the folder path and the reason. Turn it on or off under "Project health" on the admin settings page.
 - Each project row has a 12-week activity sparkline.
-- A new row of tabs with useful searches appear on *My* dashboard pages: All, Overdue, Due in 3 days, Quiet, Needs attention, and My tasks. When the [BigBoard fork by mrsuner](https://github.com/mrsuner/kanboard_plugin_bigboard) is installed, each tab gets a dropdown to view that tab search directly in BigBoard. If a tab is dimmed, it's because nothing currently comes up for that search.
+- A row of tabs with useful searches shows on the *My folders*, *My projects*, *My tasks*, and *My subtasks* pages: All, Overdue, Due today, Due this week, My tasks, No owner, Blocked, Not moved in 30 days, Quiet, and Needs attention. "Due this week" reads "Due in N days" when the "due soon" number is not 7. When the [BigBoard fork by mrsuner](https://github.com/mrsuner/kanboard_plugin_bigboard) is installed, every tab BigBoard can search gets a dropdown to switch to BigBoard with views that search directly in BigBoard. If a tab is dimmed, it's because nothing currently comes up for that search.
 
 
 ## Folder access
 
-The "Access" section on the *Settings -> SortaFolders* admin settings page gives a user or a group a project role (viewer, member, or manager) on every project in a folder and its subfolders, both now and for projects put in that folder later. This is great for setting up a user with access to a number of projects without needing to add them to each project one at a time.
-
-To see who can open each folder's projects and where the access came from, a lock means access was given by folder access (and says which folder the grant is on "from this folder" or "from the parent folder"), a user icon means a user was manually added to a project by admin, and a users icon means a group was added manually by an admin. A user with different roles on two projects in the same folder shows both ("Manager on #5, Member on #6"). Admins see everything and are not listed, and closed and personal projects are not shown.
-
 Access control features are completely optional. If you don't use the access control features, adding users remains Kanboard's job on the project's *Settings -> Permissions* page. SortaFolders only sorts projects into folders, and no memberships get added or removed.
+
+The "Access" section on the *Settings -> SortaFolders* admin settings page, however, gives a user or a group a project role (viewer, member, or manager) on every project in a folder and its subfolders, both now and for projects put in that folder later. This is great for setting up a user with access to a number of projects without needing to add them to each project one at a time.
+
+To check on who can open each folder's projects and where the access came from:
+
+- A lock means access was given by folder access (and says which folder the grant is on "from this folder" or "from the parent folder").
+- A user icon means a user was manually added to a project by admin.
+- A users icon means a group was added manually by an admin.
+
+A user with different roles on two projects in the same folder shows both ("Manager on #5, Member on #6"). Admins see everything and are not listed, and closed and personal projects are not shown.
 
 
 Use cases for an admin:
@@ -70,9 +88,9 @@ Use cases for a project manager:
 
 A project manager who sorts a project in a folder gives the folder's grantees access to that project. That's how access grants spread, so give "manager" on a folder only to someone who should manage every project in it.
 
-- Only admins add or remove access. It becomes an ordinary project membership, so it shows on each project's Permissions page.
+- Only admins can add or remove access. It becomes an ordinary project membership, so it shows on each project's Permissions page.
 - SortaFolders remembers the memberships it added. When the access is removed, the folder is removed, or a project leaves the folder, it removes those memberships and nothing else. A membership someone added manually is never changed or removed, and neither is one whose role a project manager has changed since.
-- A user who already has a role (or a higher priliged one) on a project through a group is left alone, since Kanboard reads a user's own role before their group's.
+- A user who already has a role (or a higher privileged one) on a project through a group is left alone, since Kanboard reads a user's own role before their group's.
 - Personal projects are ignored.
 - Access applies when a project is sorted through SortaFolders (via the New project form or the project's Edit folder page) and when access or the folder tree changes. Sorting through Kanboard's API (`saveProjectMetadata`) goes through SortaFolders, too. Opening a folder's Access dialog also runs it, which repairs any project that was sorted some other way.
 - A duplicate of a project inherits the members it copied, and SortaFolders adopts the ones the access added, so removing the access (or moving the copy out of the folder) takes them off the copy, too. It does this by listing the access IDs in a project metadata key, `sortafolders_applied`, which Kanboard copies with the project. Only SortaFolders writes that key, and the API refuses it.
@@ -85,23 +103,23 @@ A project manager who sorts a project in a folder gives the folder's grantees ac
 A "Show a project's folder description" admin setting on the *Settings -> SortaFolders* page shows a project's own folder description in a box under the project header on the board and the other project views. A folder with no description, a closed project, and a project in no folder show nothing, and a parent folder's description isn't repeated on its subfolders' projects.
 
 
-## BigBoard links and tabs on the dashboard
+## BigBoard links on the dashboard
 
-If the [BigBoard fork by mrsuner](https://github.com/mrsuner/kanboard_plugin_bigboard) is installed, BigBoard tabs show at the top of all the *My* dashboard pages. On *My tasks*, a task is shown when you own it or have a subtask on it, just like how Kanboard core does it.
+If the [BigBoard fork by mrsuner](https://github.com/mrsuner/kanboard_plugin_bigboard) is installed, the Overdue, Due today, Due this week, My tasks, No owner, Blocked, and Not moved in 30 days items each have a dropdown with BigBoard menu items. All, Quiet, and Needs attention don't get them, since BigBoard doesn't have search filters for those. What the item opens depends on the page:
 
-| Page | BigBoard links | Tabs |
-|---|---|---|
-| *My projects* | Overview, Overdue, Due today, Due this week, My tasks, No owner, Blocked, Not moved in 30 days | All, Overdue, Due this week, Quiet, Needs attention, My tasks |
-| *My tasks* | Due today, Due this week, My tasks, No owner, Blocked, Not moved in 30 days, each narrowed to tasks assigned to you, and the BigBoard tab opens your open tasks ("No owner" is always dimmed, since an unowned task is never yours) | All, Overdue, Due this week |
-| *My subtasks* | Due today, Due this week, My tasks, No owner, Blocked, Not moved in 30 days, but BigBoard can't search by subtask assignee, so these links find tasks you own | All, Overdue, Due this week |
+| Page | "Switch to BigBoard" opens |
+|---|---|
+| *My projects* | The search, on the projects you picked in BigBoard |
+| *My tasks* | The same search, narrowed to tasks assigned to you ("No owner" is always dimmed, since an unowned task is never yours) |
+| *My subtasks* | The same search, but BigBoard can't search by subtask assignee, so it finds tasks you own |
 
-When the [BigBoard fork by mrsuner](https://github.com/mrsuner/kanboard_plugin_bigboard) is installed, each folder has a BigBoard tab bar under its note bar. BigBoard can show everything or just the folder you selected (which BigBoard calls "projects" instead of folders, a known limitation), so the BigBoard tabs count projects sorted in that folder. Clicked tabs are saved per user, and "Clear" reloads the full list.
+On the *My folders* page, each folder's links menu has "Open this folder in BigBoard" (it follows the folder term, as in "Open this space in BigBoard") and one item for each search, narrowed to that folder, and the ones with nothing to find are dimmed. BigBoard shows the folder's projects, and its group switcher uses the folder term (see "What it overrides"). The tabs on the *My folders* page narrow the list, and a clicked tab is saved per user when its link's token comes with it, which a tab link always adds. "Clear" shows the full list again.
 
-Every folder and project row shows a progress bar based on tasks that are closed in that folder's projects (and any subfolder's projects), and a project row also shows its project managers and the date of last activity. A manager's name links to their public profile page.
+Every folder and project row shows a progress bar based on tasks that are closed in that folder's projects (and any subfolder's projects), and a project row also shows its project managers and the date of last activity.
 
 Kanboard core reserves the Summary and Time tracking pages of other users to admins, and SortaFolders doesn't change that. The "Sort" menu orders the projects inside each folder by ID, name, last activity, start date, end date, and public or personal. Folders have the order set on the admin settings page.
 
-Each folder has its own page (with pretty URLs like */folders/16*) headed "Everything for" and the folder's path. The page lists 25 top-level folders or ungrouped projects at a time, with Kanboard core's Previous and Next links.
+Each folder has its own page (with pretty URLs like */folders/16*) headed by its path, "Folders ›" and the folder names, each parent a link. The page lists 25 top-level folders or ungrouped projects at a time, with Kanboard core's Previous and Next links.
 
 
 ## Limitations
@@ -111,7 +129,10 @@ Each folder has its own page (with pretty URLs like */folders/16*) headed "Every
 - English only. Contributions are welcome.
 - The Projects page and the dashboard *My projects* list uses Kanboard's own order and aren't grouped, but SortaFolders adds a badge with the project's icon and folder name.
 - Duplicating a project copies its folder only when you choose to copy the project's metadata, too.
-- BigBoard works with SortaFolders but calls folders "projects" in its group switcher.
+- BigBoard works with SortaFolders, and its group switcher and its "Selected projects" choice follow the folder term, including "Unsorted projects".
+- BigBoard checks to see if there's a plugin called PortfolioDashboard and a `PortfolioProjectModel` class name, and SortaFolders uses that class name to integrate with BigBoard's "Selected projects" menu. If a PortfolioDashboard plugin is installed, though, or another plugin declares a class with that name, SortaFolders leaves it alone and BigBoard's group switcher lists that plugin's groups instead of your folders. A plugin that declares the same class name after SortaFolders has started can crash with "Cannot declare class".
+- A hidden folder's projects leave BigBoard's "Selected projects" list only on a BigBoard that asks SortaFolders through a `bigboard:projects:ids` hook. mrsuner's BigBoard fork has no such hook yet, so it still lists them.
+- Kanboard's own project list, search, and board switcher can't be narrowed without overriding core, so they still list the projects in a hidden folder for the people who are members, and members still open those projects. Project permissions don't change, though, and only the folder is hidden. When an admin hides a folder, the user who made a folder or was given access to it will lose sight of it.
 
 
 ## What it overrides
@@ -126,14 +147,15 @@ SortaFolders overrides:
 
 | Part | How |
 |---|---|
-| Template `dashboard/layout` | The plugin's copy adds support for BusyBee questions and BigBoard links and tabs at the top of the *My projects*, *My tasks*, *My subtasks*, and *My folders* pages. Core's pages, controller and queries are not modified, and the tabs narrow the lists through core's `pagination:dashboard:*:query` hooks |
+| Template `dashboard/layout` | The plugin's copy adds support for BusyBee questions and BigBoard links and tabs at the top of the *My projects*, *My tasks*, and *My subtasks* pages, and for BusyBee questions at the top of *Overview*. *My folders* gets the same hooks from the plugin's own folder page. Core's pages, controller and queries are not modified, and the tabs narrow the lists through core's `pagination:dashboard:*:query` hooks |
 | `sortafolders_groups`, `sortafolders_access`, `sortafolders_access_applied` and `sortafolders_notes` tables | Created by the plugin's schema on first load |
 | `sortafolders_group` and `sortafolders_applied` project metadata | The first holds a project's folder id, the second the ids of the access grants that added members (see "Folder access") |
-| `sortafolders_` settings and `sortafolders_filter` user setting | The term, icon, hidden folders, folder description and health numbers are Kanboard settings, and each user's last filter tab is kept in their user metadata |
+| `sortafolders_` settings and `sortafolders_filter` user setting | The term, icon, hidden folders, folder description and health numbers are Kanboard settings, and each user's last filter tab is kept in their user metadata, but only when the tab's link carries Kanboard's reusable CSRF token, which the tabs add. A filter in an address without it applies to that page view and isn't saved |
 | `sortaFolderModel` service and `sortaFolders` helper | New names, so nothing is replaced |
-| Hooks | `template:config:sidebar`, `template:project-list:menu:after`, `template:dashboard:sidebar`, `template:dashboard:page-header:menu`, `template:header:creation-dropdown`, `template:header:dropdown`, `template:project:creation:form`, `template:project:sidebar`, `template:dashboard:project:after-title`, `template:project:header:before`, `template:project:header:after`, `template:layout:css` and `template:layout:js`. It renders `template:sortafolders:folder:before-tabs` and `template:sortafolders:dashboard:before-tabs` for BusyBee |
+| Hooks | `template:config:sidebar`, `template:project-list:menu:after`, `template:dashboard:sidebar`, `template:dashboard:page-header:menu`, `template:header:creation-dropdown`, `template:header:dropdown`, `template:project:creation:form`, `template:project:sidebar`, `template:dashboard:project:after-title`, `template:project:header:before`, `template:project:header:after`, `template:layout:css` and `template:layout:js`. It renders `template:sortafolders:folder:before-tabs` and `template:sortafolders:dashboard:before-tabs` for BusyBee, and it listens for `bigboard:projects:ids`, which a BigBoard with that hook runs, to take the projects of hidden folders out of BigBoard's "Selected projects" list |
 | Shutdown function | After the response to a signed-in user's New project form that contains a folder, it sorts the new project, because Kanboard 1.2 has no project-created event. It does nothing for any other request |
-| BigBoard labels | At startup it adds entries to the translation table for BigBoard's "Portfolio group" strings so they follow the term settinght, but this isn't working right now. |
+| BigBoard labels | At startup it adds entries to the translation table for BigBoard's "Portfolio group", "Selected projects" and "Ungrouped projects" strings so they follow the term setting ("Selected spaces", "Selected project groups"), and renames "Ungrouped projects" to "Unsorted projects" |
+| BigBoard's group list | At startup it makes the PortfolioDashboard plugin's `PortfolioProjectModel` class name point at SortaFolders' `FolderModel`, which has the same `getProjectGrouping()`, so mrsuner's BigBoard (which looks for that class) shows a group switcher fed by the folders. It does nothing when PortfolioDashboard is installed. With mrsuner's BigBoard the dropdown shows, but choosing a folder does nothing until two bugs in its switcher are fixed (an inline `onchange` that Kanboard's Content-Security-Policy blocks, and a doubly escaped address) |
 | JavaScript | `Assets/js/sortafolders.js` remembers which folders are closed in the browser's `localStorage` and moves the "Edit folder" item to sit under "Edit project", because Kanboard has no hook at that spot |
 | Access rules | The folder admin controller (except creating a folder, which a project manager may do) and the folder access controller need an admin, the project folder controller needs a project manager, and the note controller needs a signed-in user and then checks the folder itself |
 

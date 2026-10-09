@@ -306,7 +306,7 @@ class FolderAdminController extends BaseController
     }
 
     /**
-     * Archive a folder: close every active project in it and its subfolders. The folder, the filing, and
+     * Archive a folder: close every active project in it and its subfolders. The folder, the sort, and
      * every task stay as they are, so a project can be reopened on Kanboard's Projects page. Personal
      * projects in the folder are closed too.
      */

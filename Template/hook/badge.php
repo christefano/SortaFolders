@@ -5,7 +5,7 @@
             .($folder['path'] !== $folder['name'] ? '<span class="sortafolders-sr"> ('.$this->text->e($folder['path']).')</span>' : ''),
         'FolderController',
         'show',
-        array('plugin' => 'SortaFolders', 'folder_id' => $folder['id']),
+        $this->sortaFolders->folderParams($folder['id']),
         false,
         'sortafolders-badge',
         $this->text->e($folder['path'])
