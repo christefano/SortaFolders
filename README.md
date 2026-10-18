@@ -1,4 +1,4 @@
-# SortaFolders v1.0.1
+# SortaFolders v1.0.2
 
 *SortaFolders* is a Kanboard plugin that sorts projects into folders. Kanboard doesn't let you group projects together or classify a project by putting it in another project, so *SortaFolders* adds nestable folders up to 5 levels deep and a dedicated *My folders* page on your dashboard that lists your projects by folder.
 
@@ -13,7 +13,7 @@ On the *My folders* page, any user of any project that's sorted in a folder can 
 
 ## Screenshots
 
-The *My folders* page at `/folders` shows your projects grouped by folder. Select *View folder* or use the `…` menu to open it.
+The *My folders* page at `/folders` (or `/spaces`, and so on, with the term an admin picks) shows your projects grouped by folder. Select *View folder* or use the `…` menu to open it.
 
 ![SortaFolders My folders page with folders, projects, and filter tabs](screenshots/my-folders.jpg)
 
@@ -119,7 +119,7 @@ Every folder and project row shows a progress bar based on tasks that are closed
 
 Kanboard core reserves the Summary and Time tracking pages of other users to admins, and SortaFolders doesn't change that. The "Sort" menu orders the projects inside each folder by ID, name, last activity, start date, end date, and public or personal. Folders have the order set on the admin settings page.
 
-Each folder has its own page (with pretty URLs like */folders/16*) headed by its path, "Folders ›" and the folder names, each parent a link. The page lists 25 top-level folders or ungrouped projects at a time, with Kanboard core's Previous and Next links.
+Each folder has its own page (with pretty URLs like */folders/16*, or */spaces/16* with the term "Spaces"; `/folders/16` keeps working) headed by its path, "Folders ›" and the folder names, each parent a link. The page lists 25 top-level folders or ungrouped projects at a time, with Kanboard core's Previous and Next links.
 
 
 ## Limitations
@@ -160,20 +160,21 @@ SortaFolders overrides:
 | Access rules | The folder admin controller (except creating a folder, which a project manager may do) and the folder access controller need an admin, the project folder controller needs a project manager, and the note controller needs a signed-in user and then checks the folder itself |
 
 
-## Other plugins
-
-SortaFolders works with several other plugins by the same author:
-
-- [BusyBee](https://github.com/christefano/BusyBee) adds one-click questions about your projects and tasks, such as "What is late?" and "What is blocked?", to the top of Kanboard's *My* dashboard pages. If SortaFolders is installed, the same questions also show at the top of its *My folders* page.
-- [NotifyMe](https://github.com/christefano/NotifyMe) emails you about your own actions in a project, adds a vacation mode, notifies users of failed login attempts and gives admins control of how many notifications are shown in the Notifications menu. Its email footer uses NotKanboard's name when both are installed.
-- [NotKanboard](https://github.com/christefano/NotKanboard) helps whitelabel Kanboard and replaces "Kanboard" in page titles, outgoing emails, and a few other places with your own product name.
-- [TagAlong](https://github.com/christefano/TagAlong) supercharges Kanboard email support by filtering autoreplies, email signatures, and quoted text from incoming mail, points Reply-To to the reply-by-email address and adds a reply token to email subjects, so replies become task comments through [Mailmagik](https://github.com/creecros/Mailmagik/).
-
-
 ## Compatibility
 
 - Kanboard >= 1.2.54 (the only version it has been tested on)
 - Four new tables, `sortafolders_groups`, `sortafolders_access`, `sortafolders_access_applied` and `sortafolders_notes` (UTF-8 with 4-byte characters on MySQL, so emoji in names work)
+
+
+## Other plugins
+
+SortaFolders works by itself and plays nicely with several other plugins by the same author:
+
+- [BusyBee](https://github.com/christefano/BusyBee) adds one-click questions about your projects and tasks, such as "What is late?" and "What is blocked?", to the top of Kanboard's *My* dashboard pages. If SortaFolders is installed, the same questions also show at the top of its *My folders* page.
+- [CommentTater](https://github.com/christefano/CommentTater) lets you update a task's fields while posting a comment. Changes made to the task from the comment are shown on the posted comment and are included in Kanboard email notifications, too.
+- [NotifyMe](https://github.com/christefano/NotifyMe) emails you about your own actions in a project, adds a vacation mode, notifies users of failed login attempts, and gives admins control of how many notifications are shown in the Notifications menu. Its email footer uses NotKanboard's name when both are installed.
+- [NotKanboard](https://github.com/christefano/NotKanboard) helps whitelabel Kanboard and replaces "Kanboard" in page titles, outgoing emails, and a few other places with your own product name.
+- [TagAlong](https://github.com/christefano/TagAlong) supercharges Kanboard email support by filtering autoreplies, email signatures, and quoted text from incoming mail, points Reply-To to the reply-by-email address, and adds a reply token to email subjects, so replies become task comments through [Mailmagik](https://github.com/creecros/Mailmagik/).
 
 
 ## License

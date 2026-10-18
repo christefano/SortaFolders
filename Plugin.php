@@ -109,8 +109,16 @@ class Plugin extends Base
         $this->hook->on('template:layout:js', array('template' => 'plugins/SortaFolders/Assets/js/sortafolders.js'));
 
         // Pretty URLs. Every other action keeps the query-string form, which still works.
-        $this->route->addRoute('/folders', 'FolderController', 'show', 'SortaFolders');
-        $this->route->addRoute('/folders/:folder_id', 'FolderController', 'show', 'SortaFolders');
+        // The folder pages use the admin's term in the path (/spaces/5), and /folders keeps working. The first route registered is the one links use.
+        $terms = FolderHelper::getTerms();
+        $plural = $terms[$this->helper->sortaFolders->getTermKey()][1];
+        $slugs = array_unique(array(str_replace(' ', '-', $plural), 'folders'));
+
+        foreach ($slugs as $slug) {
+            $this->route->addRoute('/'.$slug, 'FolderController', 'show', 'SortaFolders');
+            $this->route->addRoute('/'.$slug.'/:folder_id', 'FolderController', 'show', 'SortaFolders');
+        }
+
         $this->route->addRoute('/settings/sortafolders', 'FolderAdminController', 'index', 'SortaFolders');
         $this->route->addRoute('/project/:project_id/folder', 'ProjectFolderController', 'show', 'SortaFolders');
 
@@ -191,7 +199,7 @@ class Plugin extends Base
 
     public function getPluginVersion()
     {
-        return '1.0.1';
+        return '1.0.2';
     }
 
     public function getPluginHomepage()

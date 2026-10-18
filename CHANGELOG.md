@@ -1,5 +1,9 @@
 # Changelog
 
+## v1.0.2
+
+- Folder pages now use the term an admin picks for folders in their address, so with "Spaces" a folder opens at `/spaces/5` and *My spaces* at `/spaces`. A term with two words uses a hyphen (`/project-groups/5`). The `/folders` and `/folders/5` addresses still work, so saved links don't break.
+
 ## v1.0.1
 
 - Added screenshots.

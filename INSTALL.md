@@ -1,6 +1,6 @@
 # Installation
 
-This is SortaFolders v1.0.1, released as `SortaFolders-v1.0.1.zip`.
+This is SortaFolders v1.0.2, released as `SortaFolders-v1.0.2.zip`.
 
 ## Requirements
 
@@ -10,7 +10,7 @@ This is SortaFolders v1.0.1, released as `SortaFolders-v1.0.1.zip`.
 
 ## Install
 
-1. Unzip `SortaFolders-v1.0.1.zip` and put the `SortaFolders` folder into `/path/to/kanboard/plugins/`.
+1. Unzip `SortaFolders-v1.0.2.zip` and put the `SortaFolders` folder into `/path/to/kanboard/plugins/`.
 2. Reload PHP-FPM if OPcache is on and a changed file doesn't show up, since OPcache can serve the old copy for a few minutes. A first install has no old copy, so it loads right away.
 3. As an admin, open *Settings -> SortaFolders* and add a folder.
 4. As an admin or project manager, create a new folder from the main header menu or "+" menu, open a project you manage, click "Edit folder" in its settings sidebar, choose the folder, and click "Save".
